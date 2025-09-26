@@ -1,0 +1,8 @@
+import random
+input("Press any key for get 1st Card:")
+card1=random.randint(1,10)
+print("1stcard",(card1))
+input("Press any key for get 2st Card:")
+card2=random.randint(1,10)
+print("2stcard",(card2))
+print("Your point =",(card1+card2)%10) 
