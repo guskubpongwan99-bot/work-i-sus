@@ -1,37 +1,25 @@
 #include <iostream>
 #include <cstdlib>
 #include <string>
-
 using namespace std;
-
 class Player {
 public:
     virtual int choose() {
         string input;
         while(true){
             cout << "Choose: 1 = Rock, 2 = Scissors, 3 = Paper : ";
-            
-            // ใช้ getline แทน cin >> เพื่ออ่านทั้งบรรทัด (รวมช่องว่าง)
             getline(cin, input);
-
-            // ตรวจสอบว่าในบรรทัดนั้นมีแค่ตัวอักษรเดียว และเป็น 1, 2, 3 เท่านั้น
             if(input.length() == 1 && (input[0] == '1' || input[0] == '2' || input[0] == '3')) {
                 return input[0] - '0';
             }
-
-            // ถ้าใส่ "1 2 3" หรือ "1  " หรือ "p 1" มันจะติด Error ทันที
             cout << "Error: Invalid input! Please enter only 1, 2, or 3.\n";
         }
     }
 };
-
-// ... ส่วนที่เหลือ (Bot และ Game) คงเดิมเหมือนโค้ดก่อนหน้า ...
-
 class Bot : public Player {
 public:
     int choose() override { return rand() % 3 + 1; }
 };
-
 class Game {
 private:
     Player *player; Bot *bot;
@@ -65,7 +53,6 @@ public:
         else cout << "Game Draw!\n";
     }
 };
-
 int main() {
     Player p;
     Bot b;
@@ -74,3 +61,4 @@ int main() {
     game.showResult();
     return 0;
 }
+
