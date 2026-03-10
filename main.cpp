@@ -1,161 +1,297 @@
 #include <iostream>
-#include <vector>
-#include <fstream>
-#include <algorithm>
+#include <cstdlib>
 #include <ctime>
-#include <string>
-
+#include <fstream>
+#include <vector>
+#include <algorithm>
 using namespace std;
 
-// โครงสร้างเก็บข้อมูล Ranking
-struct RankEntry { string name; int score; };
-
-// --- 1. Class แม่ (Base Class) ---
-class Player {
-public:
+struct RankEntry {
     string name;
-    Player(string n) : name(n) {}
-    
-    virtual int choose(); // Method สำหรับ Scope Resolution (1)
-    
-    // Overloading Method (1): แบบไม่รับค่า (ใช้รับ Input จาก User)
-    int getChoice() { return choose(); }
-    // Overloading Method (2): แบบรับค่า (ใช้สำหรับบังคับค่าให้ Bot)
-    int getChoice(int fixed) { return fixed; }
+    int score;
 };
 
-// Scope Resolution ครั้งที่ 1
+class Player {
+protected:
+    string name;
+public:
+    Player(string n);
+    virtual int choose();
+    int choose(int c);          
+    string getName() { return name; }
+};
+
+Player::Player(string n) {
+    name = n;
+}
+
 int Player::choose() {
-    int c;
-    cout << "Choose [1:Rock, 2:Scissors, 3:Paper, 0:Exit]: ";
-    while (!(cin >> c) || c < 0 || c > 3) {
-        cout << "Invalid input! Try again: ";
-        cin.clear();
-        cin.ignore(1000, '\n');
+    char c;
+    while (true) {
+        cout << "Choose: 1 = Rock, 2 = Scissors, 3 = Paper (0 = Exit) : ";
+        cin >> c;
+
+        if (cin.peek() != '\n') {
+            cout << "Error: Please enter only ONE character\n";
+            cin.clear();
+            cin.ignore(1000, '\n');
+            continue;
+        }
+
+        if (c == '0') return 0;
+        if (c == '1') return 1;
+        if (c == '2') return 2;
+        if (c == '3') return 3;
+
+        cout << "Error: Number must be 0, 1, 2, or 3\n";
     }
+}
+
+int Player::choose(int c) {   
     return c;
 }
 
-// --- 2. Class Bot (Inheritance ครั้งที่ 1) ---
 class Bot : public Player {
 public:
     Bot(string n) : Player(n) {}
-    int choose() override { return rand() % 3 + 1; }
+    virtual int choose();
+    int choose(int c) { return c; }  
 };
 
-// --- 3. Class HardBot (Inheritance ครั้งที่ 2) ---
+int Bot::choose() {
+    return rand() % 3 + 1;
+}
+
 class HardBot : public Bot {
-    int lastMove = 0;
+private:
+    int lastPlayerMove = 0;
 public:
     HardBot(string n) : Bot(n) {}
-    void remember(int m) { lastMove = m; }
-    int choose() override {
-        if (lastMove == 0) return rand() % 3 + 1;
-        // Logic แก้ทาง: ถ้าเราออกค้อน(1) -> Bot ออกกระดาษ(3), ถ้าเราออกกรรไกร(2) -> Bot ออกค้อน(1)
-        return (lastMove == 1) ? 3 : (lastMove == 2) ? 1 : 2;
-    }
+    void rememberMove(int move) { lastPlayerMove = move; }
+    int choose();
 };
 
-// --- 4. Class Rank (จัดการไฟล์) ---
+int HardBot::choose() {
+    if (lastPlayerMove == 0) return rand() % 3 + 1;
+    if (lastPlayerMove == 1) return 3; 
+    if (lastPlayerMove == 2) return 1; 
+    return 2;                         
+}
+
 class Rank {
-    vector<RankEntry> list;
+private:
+    vector<RankEntry> rankList;
+    string filename = "rank.txt";
 public:
-    void load() {
-        list.clear();
-        ifstream f("rank.txt");
-        RankEntry e;
-        while (f >> e.name >> e.score) list.push_back(e);
-        f.close();
-    }
-
-    void save(); // Method สำหรับ Scope Resolution (2)
-
-    void add(string n, int s) {
-        bool found = false;
-        for (auto &e : list) {
-            if (e.name == n) {
-                if (s > e.score) e.score = s;
-                found = true; break;
-            }
-        }
-        if (!found) list.push_back({n, s});
-    }
-
-    void show() {
-        cout << "\n========== RANKING ==========\n";
-        if (list.empty()) cout << "No records yet.\n";
-        for (int i = 0; i < list.size(); i++) {
-            cout << i + 1 << ". " << list[i].name << " : " << list[i].score << " pts\n";
-        }
-        cout << "=============================\n";
-    }
+    void loadRank();
+    void saveRank();
+    void addScore(string name, int score);
+    void showRank();
 };
 
-// Scope Resolution ครั้งที่ 2
-void Rank::save() {
-    sort(list.begin(), list.end(), [](RankEntry a, RankEntry b) {
+void Rank::loadRank() {
+    ifstream file(filename);
+    if (!file.is_open()) return;
+    RankEntry entry;
+    while (file >> entry.name >> entry.score) {
+        rankList.push_back(entry);
+    }
+    file.close();
+}
+
+void Rank::saveRank() {
+    ofstream file(filename);
+    file << "================================\n";
+    file << "         RANKING BOARD\n";
+    file << "================================\n";
+
+    sort(rankList.begin(), rankList.end(), [](RankEntry a, RankEntry b) {
         return a.score > b.score;
     });
-    ofstream f("rank.txt");
-    for (auto &e : list) f << e.name << " " << e.score << "\n";
-    f.close();
+
+    int place = 1;
+    for (auto& e : rankList) {
+        string medal = "";
+        if (place == 1) medal = " [1st]";
+        else if (place == 2) medal = " [2nd]";
+        else if (place == 3) medal = " [3rd]";
+        else medal = " [" + to_string(place) + "th]";
+
+        file << medal << " " << e.name << " - " << e.score << " pts\n";
+        place++;
+    }
+
+    if (rankList.empty()) file << "  No records yet.\n";
+    file << "================================\n";
+    file.close();
+}
+
+void Rank::addScore(string name, int score) {
+    for (auto& e : rankList) {
+        if (e.name == name) {
+            if (score > e.score) e.score = score;
+            return;
+        }
+    }
+    rankList.push_back({name, score});
+}
+
+void Rank::showRank() {
+    sort(rankList.begin(), rankList.end(), [](RankEntry a, RankEntry b) {
+        return a.score > b.score;
+    });
+    cout << "\n===== RANKING =====\n";
+    int place = 1;
+    for (auto& e : rankList) {
+        cout << place++ << ". " << e.name << " - " << e.score << " pts\n";
+    }
+    if (rankList.empty()) cout << "No records yet.\n";
+    cout << "===================\n";
+}
+
+class Game {
+private:
+    Player*   player;
+    Bot*      bot;
+    HardBot*  hardBot;   
+    bool      isHard;
+    int scorePlayer = 0;
+    int scoreBot    = 0;
+    bool exited     = false;
+public:
+    Game(Player* p, Bot* b, bool hard = false);
+    void playRound(int round);
+    void showResult(Rank& rank);
+    int  checkWin(int p, int b);
+    bool isExited() { return exited; }
+};
+
+Game::Game(Player* p, Bot* b, bool hard) {
+    player  = p;
+    bot     = b;
+    isHard  = hard;
+    hardBot = hard ? dynamic_cast<HardBot*>(b) : nullptr;
+}
+
+string convertChoice(int c) {
+    if (c == 1) return "Rock";
+    if (c == 2) return "Scissors";
+    if (c == 3) return "Paper";
+    return "";
+}
+
+void Game::playRound(int round) {
+    cout << "\n----- Round " << round << " -----\n";
+    int p = player->choose();
+    if (p == 0) {
+        cout << "You exited the game.\n";
+        exited = true;
+        return;
+    }
+
+    int b = (round == 1) ? bot->choose(1) : bot->choose();
+
+    cout << "You chose  : " << convertChoice(p) << "\n";
+    cout << "Bot chose  : " << convertChoice(b) << "\n";
+
+    int result = checkWin(p, b);
+    if (result == 1) {
+        cout << "You win this round!\n";
+        scorePlayer++;
+    } else if (result == 2) {
+        cout << "Bot wins this round!\n";
+        scoreBot++;
+    } else {
+        cout << "Draw!\n";
+    }
+    if (isHard && hardBot != nullptr) {
+        hardBot->rememberMove(p);
+    }
+}
+
+int Game::checkWin(int p, int b) {
+    if (p == b) return 0;
+    if ((p == 1 && b == 2) ||
+        (p == 2 && b == 3) ||
+        (p == 3 && b == 1))
+        return 1;
+    return 2;
+}
+
+void Game::showResult(Rank& rank) {
+    cout << "\n===== FINAL RESULT =====\n";
+    cout << "Player Score : " << scorePlayer << "\n";
+    cout << "Bot Score    : " << scoreBot    << "\n";
+
+    if (scorePlayer > scoreBot)
+        cout << "You win the game!\n";
+    else if (scoreBot > scorePlayer)
+        cout << "Bot wins the game!\n";
+    else
+        cout << "Game Draw!\n";
+
+    rank.addScore(player->getName(), scorePlayer);
+    rank.saveRank();
+    rank.showRank();
 }
 
 int main() {
     srand(time(0));
+
     Rank rank;
-    rank.load();
-    
-    char menu;
-    string names[] = {"Exit", "Rock", "Scissors", "Paper"};
+    rank.loadRank();
 
     while (true) {
-        cout << "\n--- MAIN MENU ---\n1. Normal Mode\n2. Hard Mode\n3. Show Rank\n4. Exit\nSelect: ";
+        cout << "\n===== MENU =====\n";
+        cout << "1. Play Game (Normal Bot)\n";
+        cout << "2. Play Game (Hard Bot)\n";
+        cout << "3. Show Ranking\n";
+        cout << "4. Exit\n";
+        cout << "Choose: ";
+
+        char menu;
         cin >> menu;
 
-        if (menu == '4') break;
-        if (menu == '3') { rank.show(); continue; }
-        if (menu != '1' && menu != '2') continue;
-
-        string pName;
-        cout << "Enter Player Name: ";
-        cin >> pName;
-
-        Player p(pName);
-        Bot* b;
-        if (menu == '2') b = new HardBot("HardBot");
-        else b = new Bot("NormalBot");
-
-        int pScore = 0, bScore = 0;
-
-        for (int r = 1; r <= 3; r++) {
-            cout << "\nRound " << r << "!" << endl;
-            int pc = p.getChoice(); // เรียกใช้ Overloading 1
-            if (pc == 0) break;
-
-            // เรียกใช้ Overloading 2: รอบแรก Bot จะออกค้อนเสมอ (เลข 1) เพื่อโชว์การใช้ Method
-            int bc = (r == 1) ? b->getChoice(1) : b->choose();
-
-            cout << ">> " << pName << ": " << names[pc] << " vs Bot: " << names[bc] << endl;
-
-            if (pc == bc) cout << "Result: Draw!" << endl;
-            else if ((pc == 1 && bc == 2) || (pc == 2 && bc == 3) || (pc == 3 && bc == 1)) {
-                cout << "Result: You Win!" << endl;
-                pScore++;
-            } else {
-                cout << "Result: Bot Win!" << endl;
-                bScore++;
-            }
-
-            if (menu == '2') ((HardBot*)b)->remember(pc);
+        if (cin.peek() != '\n') {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout << "Error: Please enter only ONE character\n";
+            continue;
         }
 
-        cout << "\nFinal Score -> You: " << pScore << " | Bot: " << bScore << endl;
-        rank.add(pName, pScore);
-        rank.save();
-        delete b;
+        if (menu == '4') {
+            cout << "Goodbye!\n";
+            break;
+        } else if (menu == '3') {
+            rank.showRank();
+        } else if (menu == '1' || menu == '2') {
+            string playerName;
+            cout << "Enter your name: ";
+            cin >> playerName;
+            cin.ignore(1000, '\n');
+
+            Player p(playerName);
+
+            if (menu == '2') {
+                HardBot hb("HardBot");
+                Game game(&p, &hb, true);
+                cout << "[Hard Mode] Bot will counter your previous move!\n";
+                for (int i = 1; i <= 3; i++) {
+                    game.playRound(i);
+                    if (game.isExited()) break;
+                }
+                if (!game.isExited()) game.showResult(rank);
+            } else {
+                Bot b("Bot");
+                Game game(&p, &b, false);
+                for (int i = 1; i <= 3; i++) {
+                    game.playRound(i);
+                    if (game.isExited()) break;
+                }
+                if (!game.isExited()) game.showResult(rank);
+            }
+        }
     }
 
-    cout << "Goodbye!" << endl;
     return 0;
 }
