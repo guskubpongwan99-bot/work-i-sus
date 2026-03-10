@@ -1,22 +1,27 @@
 #include <iostream>
 #include <cstdlib>
+#include <string>
 
 using namespace std;
 
 class Player {
 public:
     virtual int choose() {
-        int c;
+        string input;
         while(true){
             cout << "Choose: 1 = Rock, 2 = Scissors, 3 = Paper : ";
-            if(!(cin >> c)){
-                cout << "Error: Numbers only (1-3)\n";
-                cin.clear();
-                cin.ignore(1000,'\n');
-                continue;
+            cin >> input;
+
+            if(input.length() == 1 && (input[0] == '1' || input[0] == '2' || input[0] == '3')) {
+                return input[0] - '0'; 
             }
-            if(c < 1 || c > 3) continue;
-            return c;
+
+            // ถ้าหลุดมาตรงนี้แปลว่าผิดรูปแบบ (เช่น 11, 1p, 9999999999, หรือตัวอักษร)
+            cout << "Error: Number must be between 1 and 3\n";
+            
+            // ล้าง Buffer เผื่อกรณีมีการพิมพ์เว้นวรรคยาวๆ
+            cin.clear();
+            cin.ignore(1000, '\n');
         }
     }
 };
@@ -50,8 +55,9 @@ public:
 
         cout << "You chose: " << convertChoice(p) << " | Bot chose: " << convertChoice(b) << endl;
 
-        if (p == b) cout << "Draw!\n";
-        else if ((p == 1 && b == 2) || (p == 2 && b == 3) || (p == 3 && b == 1)) {
+        if (p == b) {
+            cout << "Draw!\n";
+        } else if ((p == 1 && b == 2) || (p == 2 && b == 3) || (p == 3 && b == 1)) {
             cout << "You win this round!\n";
             scorePlayer++;
         } else {
