@@ -10,54 +10,46 @@ public:
         string input;
         while(true){
             cout << "Choose: 1 = Rock, 2 = Scissors, 3 = Paper : ";
-            cin >> input;
+            
+            // ใช้ getline แทน cin >> เพื่ออ่านทั้งบรรทัด (รวมช่องว่าง)
+            getline(cin, input);
 
+            // ตรวจสอบว่าในบรรทัดนั้นมีแค่ตัวอักษรเดียว และเป็น 1, 2, 3 เท่านั้น
             if(input.length() == 1 && (input[0] == '1' || input[0] == '2' || input[0] == '3')) {
-                return input[0] - '0'; 
+                return input[0] - '0';
             }
 
-            // ถ้าหลุดมาตรงนี้แปลว่าผิดรูปแบบ (เช่น 11, 1p, 9999999999, หรือตัวอักษร)
-            cout << "Error: Number must be between 1 and 3\n";
-            
-            // ล้าง Buffer เผื่อกรณีมีการพิมพ์เว้นวรรคยาวๆ
-            cin.clear();
-            cin.ignore(1000, '\n');
+            // ถ้าใส่ "1 2 3" หรือ "1  " หรือ "p 1" มันจะติด Error ทันที
+            cout << "Error: Invalid input! Please enter only 1, 2, or 3.\n";
         }
     }
 };
 
+// ... ส่วนที่เหลือ (Bot และ Game) คงเดิมเหมือนโค้ดก่อนหน้า ...
+
 class Bot : public Player {
 public:
-    int choose() override {
-        return rand() % 3 + 1;
-    }
+    int choose() override { return rand() % 3 + 1; }
 };
 
 class Game {
 private:
-    Player *player;
-    Bot *bot;
+    Player *player; Bot *bot;
     int scorePlayer = 0, scoreBot = 0;
-
     string convertChoice(int c) {
         if(c==1) return "Rock";
         if(c==2) return "Scissors";
         return "Paper";
     }
-
 public:
     Game(Player *p, Bot *b) : player(p), bot(b) {}
-
     void playRound(int round) {
         cout << "\n----- Round " << round << " -----\n";
         int p = player->choose();
         int b = bot->choose();
-
         cout << "You chose: " << convertChoice(p) << " | Bot chose: " << convertChoice(b) << endl;
-
-        if (p == b) {
-            cout << "Draw!\n";
-        } else if ((p == 1 && b == 2) || (p == 2 && b == 3) || (p == 3 && b == 1)) {
+        if (p == b) cout << "Draw!\n";
+        else if ((p == 1 && b == 2) || (p == 2 && b == 3) || (p == 3 && b == 1)) {
             cout << "You win this round!\n";
             scorePlayer++;
         } else {
@@ -65,7 +57,6 @@ public:
             scoreBot++;
         }
     }
-
     void showResult() {
         cout << "\n===== FINAL RESULT =====\n";
         cout << "Player: " << scorePlayer << " - Bot: " << scoreBot << endl;
@@ -79,11 +70,7 @@ int main() {
     Player p;
     Bot b;
     Game game(&p, &b);
-
-    for (int i = 1; i <= 3; i++) {
-        game.playRound(i);
-    }
+    for (int i = 1; i <= 3; i++) game.playRound(i);
     game.showResult();
-
     return 0;
 }
