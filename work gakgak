@@ -1,0 +1,47 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
+ */
+package javaapplication23;
+import java.util.Scanner;
+/**
+ *
+ * @author Admin
+ */
+public class JavaApplication23 {
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String[] args) {
+        // TODO code application logic here
+         Scanner sc = new Scanner(System.in);
+                 
+         double money ;
+         double amercarno = 45 , carpuchino = 50 , magka = 60,  gogro = 55 , greentea = 50 , lartea = 55 ; 
+         int total ;
+         String[][] menu = {{"1. อเมริกาโน่","45  บาท"},{"2. คาปูชิโน่","50  บาท"},{"3. มอคค่า","60  บาท"},{"4. โกโก้","55  บาท"},{"5. ชาเขียว","50  บาท"},{"6. ลาเต้","55  บาท"},{"0. จบการสั่งซื้อ",""}} ;
+        while( != true){
+            System.out.println("===ยินดีต้อนรับสู่ร้านกาแฟ===");
+             System.out.println("-----เมนูสินค้า-----");
+         
+          for(int i = 0 ; i<menu.length; i++){
+             
+              
+              for(int j = 0 ; j<menu[j].length; j++){
+              System.out.print(menu[i][j]+"\t");
+         }
+              System.out.println();
+              System.out.println("Choose your menu");
+                String Choose = sc.nextLine();
+              
+              
+         }
+          
+        }
+        
+         
+         
+   }
+    
+}
