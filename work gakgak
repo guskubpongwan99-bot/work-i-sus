@@ -16,12 +16,13 @@ public class JavaApplication23 {
     public static void main(String[] args) {
         // TODO code application logic here
          Scanner sc = new Scanner(System.in);
-                 
+         double[] total;
          double money ;
+         int sum ;
          double amercarno = 45 , carpuchino = 50 , magka = 60,  gogro = 55 , greentea = 50 , lartea = 55 ; 
-         int total ;
+         
          String[][] menu = {{"1. อเมริกาโน่","45  บาท"},{"2. คาปูชิโน่","50  บาท"},{"3. มอคค่า","60  บาท"},{"4. โกโก้","55  บาท"},{"5. ชาเขียว","50  บาท"},{"6. ลาเต้","55  บาท"},{"0. จบการสั่งซื้อ",""}} ;
-        while( != true){
+        while(true){
             System.out.println("===ยินดีต้อนรับสู่ร้านกาแฟ===");
              System.out.println("-----เมนูสินค้า-----");
          
@@ -32,14 +33,61 @@ public class JavaApplication23 {
               System.out.print(menu[i][j]+"\t");
          }
               System.out.println();
-              System.out.println("Choose your menu");
-                String Choose = sc.nextLine();
-              
-              
+             
          }
-          
-        }
+            System.out.println("Choose your menu");
+                 int Choose = sc.nextInt();
+                 
+               if (Choose == 1){
+                     System.out.println("อเมริกาโน่ 45  บาท");
+                     System.out.println("กรุณาเลือกจำนวนแก้ว" );
+                     int quantity = sc.nextInt();
+                     
+                    total =+ (45*quantity);
+                     
+                 } 
+               else if(Choose == 2){
+                   System.out.println("คาปูชิโน่ 50  บาท");
+                     System.out.println("กรุณาเลือกจำนวนแก้ว" );
+                     int quantity = sc.nextInt();
+                      total =+ (50*quantity);
+               }
+               else if(Choose == 3){
+                   System.out.println(" มอคค่า 60  บาท");
+                     System.out.println("กรุณาเลือกจำนวนแก้ว" );
+                     int quantity = sc.nextInt();
+                      total =+ (60*quantity);
+               }
+               else if(Choose == 4){
+                   System.out.println(" โกโก้	55  บาท");
+                     System.out.println("กรุณาเลือกจำนวนแก้ว" );
+                     int quantity = sc.nextInt();
+                      total =+ (55*quantity);
+               }
+               else if(Choose == 5){
+                   System.out.println("ชาเขียว	50  บาท");
+                     System.out.println("กรุณาเลือกจำนวนแก้ว" );
+                     int quantity = sc.nextInt();
+                     total =+ (50*quantity);
+               }
+               else if(Choose == 6){
+                   System.out.println(" ลาเต้	55  บาท");
+                     System.out.println("กรุณาเลือกจำนวนแก้ว" );
+                     int quantity = sc.nextInt();
+                     total =+ (55*quantity);
+               }
+               else if(Choose == 0){
+                   break;
+               }
+                else{
+                   System.out.println("ไม่มีเมนูนี้");
+                }      
+               
+                         
         
+        }
+         System.out.println(total);
+     
          
          
    }
