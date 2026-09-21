@@ -14,10 +14,8 @@ public class JavaApplication23 {
         
         
         double[] prices = {45, 50, 60, 55, 50, 55}; 
-       
         
         int[] quantities = new int[6]; 
-        
         
         String[][] menu = {
             {"1. Americano", "45 THB"},
@@ -37,10 +35,8 @@ public class JavaApplication23 {
             System.out.println("----- Menu -----"); 
 
             for (int i = 0; i < menu.length; i++) { 
-            //  สำหรับไล่ดูแต่ละแถวของเมนู 
             
                 for (int j = 0; j < menu[i].length; j++){ 
-                // []  inner loop สำหรับไล่ดูแต่ละคอลัมน์ในแถวนั้นๆ
                 
                     System.out.print(menu[i][j] + "\t"); 
                    
@@ -68,9 +64,18 @@ public class JavaApplication23 {
                 
                 System.out.print("Enter quantity: "); 
                 
-                int qty = sc.nextInt(); 
-                
-                quantities[menuIndex] += qty; 
+                            int qty = sc.nextInt(); 
+                            
+                            if (qty <= 0) {
+                                        System.out.println("Invalid quantity! Please enter a number greater than 0.");
+                                        System.out.println();
+                                        continue; // กรณีลูกค้าใส่ -
+                                    }
+                            
+
+                              quantities[menuIndex] += qty; 
+                            
+                            
        
 
             } else { 
