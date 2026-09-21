@@ -1,95 +1,145 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Main.java to edit this template
- */
-package javaapplication23;
-import java.util.Scanner;
-/**
- *
- * @author Admin
- */
-public class JavaApplication23 {
+package com.mycompany.javaapplication23; 
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        // TODO code application logic here
-         Scanner sc = new Scanner(System.in);
-         double[] total;
-         double money ;
-         int sum ;
-         double amercarno = 45 , carpuchino = 50 , magka = 60,  gogro = 55 , greentea = 50 , lartea = 55 ; 
-         
-         String[][] menu = {{"1. อเมริกาโน่","45  บาท"},{"2. คาปูชิโน่","50  บาท"},{"3. มอคค่า","60  บาท"},{"4. โกโก้","55  บาท"},{"5. ชาเขียว","50  บาท"},{"6. ลาเต้","55  บาท"},{"0. จบการสั่งซื้อ",""}} ;
-        while(true){
-            System.out.println("===ยินดีต้อนรับสู่ร้านกาแฟ===");
-             System.out.println("-----เมนูสินค้า-----");
-         
-          for(int i = 0 ; i<menu.length; i++){
-             
-              
-              for(int j = 0 ; j<menu[j].length; j++){
-              System.out.print(menu[i][j]+"\t");
-         }
-              System.out.println();
-             
-         }
-            System.out.println("Choose your menu");
-                 int Choose = sc.nextInt();
-                 
-               if (Choose == 1){
-                     System.out.println("อเมริกาโน่ 45  บาท");
-                     System.out.println("กรุณาเลือกจำนวนแก้ว" );
-                     int quantity = sc.nextInt();
-                     
-                    total =+ (45*quantity);
-                     
-                 } 
-               else if(Choose == 2){
-                   System.out.println("คาปูชิโน่ 50  บาท");
-                     System.out.println("กรุณาเลือกจำนวนแก้ว" );
-                     int quantity = sc.nextInt();
-                      total =+ (50*quantity);
-               }
-               else if(Choose == 3){
-                   System.out.println(" มอคค่า 60  บาท");
-                     System.out.println("กรุณาเลือกจำนวนแก้ว" );
-                     int quantity = sc.nextInt();
-                      total =+ (60*quantity);
-               }
-               else if(Choose == 4){
-                   System.out.println(" โกโก้	55  บาท");
-                     System.out.println("กรุณาเลือกจำนวนแก้ว" );
-                     int quantity = sc.nextInt();
-                      total =+ (55*quantity);
-               }
-               else if(Choose == 5){
-                   System.out.println("ชาเขียว	50  บาท");
-                     System.out.println("กรุณาเลือกจำนวนแก้ว" );
-                     int quantity = sc.nextInt();
-                     total =+ (50*quantity);
-               }
-               else if(Choose == 6){
-                   System.out.println(" ลาเต้	55  บาท");
-                     System.out.println("กรุณาเลือกจำนวนแก้ว" );
-                     int quantity = sc.nextInt();
-                     total =+ (55*quantity);
-               }
-               else if(Choose == 0){
-                   break;
-               }
-                else{
-                   System.out.println("ไม่มีเมนูนี้");
-                }      
-               
-                         
-        
-        }
-         System.out.println(total);
-     
-         
-         
-   }
+
+import java.util.Scanner; 
+
+
+public class JavaApplication23 { 
+
+
+    public static void main(String[] args) { 
+    //  (main method) 
     
-}
+        Scanner sc = new Scanner(System.in); 
+        
+        
+        double[] prices = {45, 50, 60, 55, 50, 55}; 
+       
+        
+        int[] quantities = new int[6]; 
+        
+        
+        String[][] menu = {
+            {"1. Americano", "45 THB"},
+            {"2. Cappuccino", "50 THB"},
+            {"3. Mocha", "60 THB"},
+            {"4. Cocoa", "55 THB"},
+            {"5. Green Tea", "50 THB"},
+            {"6. Latte", "55 THB"},
+            {"0. Exit/Checkout", ""}
+        }; 
+        
+
+        while (true) { 
+       
+            System.out.println("=== Welcome to Coffee Shop ==="); 
+            
+            System.out.println("----- Menu -----"); 
+
+            for (int i = 0; i < menu.length; i++) { 
+            //  สำหรับไล่ดูแต่ละแถวของเมนู 
+            
+                for (int j = 0; j < menu[i].length; j++){ 
+                // []  inner loop สำหรับไล่ดูแต่ละคอลัมน์ในแถวนั้นๆ
+                
+                    System.out.print(menu[i][j] + "\t"); 
+                   
+                }
+                
+                System.out.println(); 
+     
+            }
+
+            System.out.print("Choose your menu: "); 
+            
+            int Choose = sc.nextInt(); 
+
+            if (Choose == 0) {            
+            
+                break; 
+              
+            }
+
+            if (Choose >= 1 && Choose <= 6) { 
+            
+                int menuIndex = Choose - 1; 
+                
+                System.out.println("Selected: " + menu[menuIndex][0]); 
+                
+                System.out.print("Enter quantity: "); 
+                
+                int qty = sc.nextInt(); 
+                
+                quantities[menuIndex] += qty; 
+       
+
+            } else { 
+            
+                System.out.println("Invalid menu option. Please try again."); 
+                
+                System.out.println();
+                
+                continue; 
+                
+            }
+
+            sc.nextLine(); 
+            
+            
+            System.out.print("Do you want to order more? (Y/N): "); 
+           
+            
+            String continueOrder = sc.nextLine(); 
+            // medthod sc.nextLine() รับคำตอบ Y/N มาเก็บใน continueOrder
+
+            if (continueOrder.equalsIgnoreCase("N")) { 
+            // medthod continueOrder.equalsIgnoreCase() เช็คว่าผู้ใช้พิมพ์ N หรือ n หรือไม่
+            
+                break; 
+
+            }
+            
+            System.out.println(); 
+            
+        }
+
+        double subtotal = 0.0; 
+        
+        System.out.println("\n================================="); 
+        
+        System.out.println("--------- Order Summary ---------"); 
+      
+        for (int i = 0; i < quantities.length; i++) { 
+        
+            if (quantities[i] > 0) { 
+            
+                double itemTotal = quantities[i] * prices[i]; 
+               
+                subtotal += itemTotal; 
+                
+                System.out.println(menu[i][0] + " x " + quantities[i] + " = " + itemTotal + " THB"); 
+                
+            }
+        }
+
+        double discount = subtotal * 0.10; 
+       
+        double finalTotal = subtotal - discount; 
+      
+        System.out.println("---------------------------------"); 
+        
+        System.out.println("Subtotal: " + subtotal + " THB"); 
+        
+        System.out.println("Discount (10%): -" + discount + " THB");
+        
+        System.out.println("Total Amount: " + finalTotal + " THB"); 
+        
+        System.out.println("================================="); 
+
+        sc.close(); 
+        
+        
+    } 
+   
+    
+} 
