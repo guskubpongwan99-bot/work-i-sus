@@ -1,0 +1,261 @@
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Scanner;
+
+public class MusicPlaylist {
+
+    // ---------- Node ของ Doubly Linked List ----------
+    static class Node {
+        String name;
+        Node prev, next;
+
+        Node(String name) {
+            this.name = name;
+        }
+    }
+
+    // ---------- Doubly Linked List ----------
+    static class Playlist {
+        Node head, tail;
+        int size = 0;
+
+        // เพิ่มเพลงท้ายลิสต์
+        void add(String name) {
+            Node n = new Node(name);
+            if (head == null) {
+                head = tail = n;
+            } else {
+                tail.next = n;
+                n.prev = tail;
+                tail = n;
+            }
+            size++;
+        }
+
+        // แทรกเพลงที่ตำแหน่ง index (ใช้ตอน undo การลบ)
+        void insertAt(int index, String name) {
+            if (index >= size) {
+                add(name);
+                return;
+            }
+            Node n = new Node(name);
+            if (index == 0) {
+                n.next = head;
+                head.prev = n;
+                head = n;
+            } else {
+                Node cur = head;
+                for (int i = 0; i < index; i++) cur = cur.next;
+                n.prev = cur.prev;
+                n.next = cur;
+                cur.prev.next = n;
+                cur.prev = n;
+            }
+            size++;
+        }
+
+        // ค้นหาเพลง (ไม่สนตัวพิมพ์เล็ก/ใหญ่)
+        Node search(String name) {
+            for (Node cur = head; cur != null; cur = cur.next) {
+                if (cur.name.equalsIgnoreCase(name)) return cur;
+            }
+            return null;
+        }
+
+        int indexOf(Node target) {
+            int i = 0;
+            for (Node cur = head; cur != null; cur = cur.next, i++) {
+                if (cur == target) return i;
+            }
+            return -1;
+        }
+
+        // ลบ node ที่ระบุ
+        void delete(Node n) {
+            if (n.prev != null) n.prev.next = n.next; else head = n.next;
+            if (n.next != null) n.next.prev = n.prev; else tail = n.prev;
+            size--;
+        }
+
+        void removeLast() {
+            if (tail != null) delete(tail);
+        }
+
+        boolean isEmpty() {
+            return size == 0;
+        }
+
+        void print() {
+            int i = 1;
+            for (Node cur = head; cur != null; cur = cur.next) {
+                System.out.println(i++ + ". " + cur.name);
+            }
+        }
+    }
+
+    // ---------- เก็บประวัติสำหรับ Undo ----------
+    static class Action {
+        boolean wasAdd;   // true = เพิ่ม, false = ลบ
+        String name;
+        int index;
+
+        Action(boolean wasAdd, String name, int index) {
+            this.wasAdd = wasAdd;
+            this.name = name;
+            this.index = index;
+        }
+    }
+
+    static final int MAX_UNDO = 5;
+    static final String LINE = "-----------";
+
+    static Playlist playlist = new Playlist();
+    static Deque<Action> undoStack = new ArrayDeque<>();
+    static Scanner sc = new Scanner(System.in);
+
+    static void pushUndo(Action a) {
+        if (undoStack.size() == MAX_UNDO) undoStack.removeLast(); // เก็บย้อนหลังได้ 5 ครั้ง
+        undoStack.push(a);
+    }
+
+    static void showMenu() {
+        System.out.println(LINE);
+        System.out.println("Music Playlist");
+        System.out.println("1. Add");
+        System.out.println("2. Search");
+        System.out.println("3. Deleted");
+        System.out.println("4. Playlist");
+        System.out.println("0. Close");
+        System.out.println(LINE);
+    }
+
+    // 1. Add
+    static void addSong() {
+        System.out.print("Enter music name : ");
+        String name = sc.nextLine().trim();
+        if (name.isEmpty()) {
+            System.out.println("Music name is empty.");
+            return;
+        }
+        playlist.add(name);
+        pushUndo(new Action(true, name, playlist.size - 1));
+        System.out.println("\"" + name + "\" Add success");
+    }
+
+    // 2. Search
+    static void searchSong() {
+        while (true) {
+            System.out.print("Search You Music : ");
+            String name = sc.nextLine().trim();
+            Node found = playlist.search(name);
+            if (found != null) {
+                System.out.println("Found: " + found.name);
+                return;
+            }
+            System.out.println("not found");
+            System.out.println("    please enter again");
+            System.out.print("(press Enter to go back, or type again) ");
+            // ให้ผู้ใช้กรอกใหม่ หรือกด Enter เพื่อกลับเมนู
+            String again = sc.nextLine().trim();
+            if (again.isEmpty()) return;
+            Node f2 = playlist.search(again);
+            if (f2 != null) {
+                System.out.println("Found: " + f2.name);
+                return;
+            }
+        }
+    }
+
+    // 3. Deleted
+    static void deleteSong() {
+        if (playlist.isEmpty()) {
+            System.out.println("Playlist is empty.");
+            return;
+        }
+        System.out.print("Enter music name to delete : ");
+        String name = sc.nextLine().trim();
+        Node found = playlist.search(name);
+        if (found == null) {
+            System.out.println("not found");
+            return;
+        }
+        int idx = playlist.indexOf(found);
+        String realName = found.name;
+        playlist.delete(found);
+        pushUndo(new Action(false, realName, idx));
+        System.out.println("\"" + realName + "\" Deleted success");
+    }
+
+    // 4. Playlist  (แสดงรายการ + Next / Previous)
+    static void showPlaylist() {
+        if (playlist.isEmpty()) {
+            System.out.println("Playlist is empty.");
+            return;
+        }
+        System.out.println("---- Playlist ----");
+        playlist.print();
+        System.out.println("------------------");
+
+        Node current = playlist.head;
+        while (true) {
+            System.out.println("Now playing : " + current.name);
+            System.out.print("[N] Next  [P] Previous  [B] Back : ");
+            String cmd = sc.nextLine().trim().toLowerCase();
+            if (cmd.equals("n")) {
+                if (current.next != null) current = current.next;
+                else System.out.println("This is the last song.");
+            } else if (cmd.equals("p")) {
+                if (current.prev != null) current = current.prev;
+                else System.out.println("This is the first song.");
+            } else if (cmd.equals("b")) {
+                return;
+            } else {
+                System.out.println("Invalid command.");
+            }
+        }
+    }
+
+    // 5. Undo (พิมพ์ 5 ได้สูงสุด 5 ครั้ง)
+    static void undo() {
+        if (undoStack.isEmpty()) {
+            System.out.println("Nothing to undo.");
+            return;
+        }
+        Action a = undoStack.pop();
+        if (a.wasAdd) {
+            playlist.removeLast();
+            System.out.println("Undo add : \"" + a.name + "\" removed");
+        } else {
+            playlist.insertAt(a.index, a.name);
+            System.out.println("Undo delete : \"" + a.name + "\" restored");
+        }
+    }
+
+    public static void main(String[] args) {
+        while (true) {
+            showMenu();
+            System.out.print("Enter num(undo 5) : ");
+            String input = sc.nextLine().trim();
+            int choice;
+            try {
+                choice = Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a number.");
+                continue;
+            }
+
+            switch (choice) {
+                case 1: addSong();      break;
+                case 2: searchSong();   break;
+                case 3: deleteSong();   break;
+                case 4: showPlaylist(); break;
+                case 5: undo();         break;
+                case 0:
+                    System.out.println("Bye!");
+                    return;
+                default:
+                    System.out.println("Invalid number.");
+            }
+        }
+    }
+}
