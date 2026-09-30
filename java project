@@ -4,7 +4,6 @@ import java.util.Scanner;
 
 public class MusicPlaylist {
 
-    // ---------- Node ของ Doubly Linked List ----------
     static class Node {
         String name;
         Node prev, next;
@@ -14,12 +13,10 @@ public class MusicPlaylist {
         }
     }
 
-    // ---------- Doubly Linked List ----------
     static class Playlist {
         Node head, tail;
         int size = 0;
 
-        // เพิ่มเพลงท้ายลิสต์
         void add(String name) {
             Node n = new Node(name);
             if (head == null) {
@@ -32,7 +29,6 @@ public class MusicPlaylist {
             size++;
         }
 
-        // แทรกเพลงที่ตำแหน่ง index (ใช้ตอน undo การลบ)
         void insertAt(int index, String name) {
             if (index >= size) {
                 add(name);
@@ -54,7 +50,6 @@ public class MusicPlaylist {
             size++;
         }
 
-        // ค้นหาเพลง (ไม่สนตัวพิมพ์เล็ก/ใหญ่)
         Node search(String name) {
             for (Node cur = head; cur != null; cur = cur.next) {
                 if (cur.name.equalsIgnoreCase(name)) return cur;
@@ -70,7 +65,6 @@ public class MusicPlaylist {
             return -1;
         }
 
-        // ลบ node ที่ระบุ
         void delete(Node n) {
             if (n.prev != null) n.prev.next = n.next; else head = n.next;
             if (n.next != null) n.next.prev = n.prev; else tail = n.prev;
@@ -93,9 +87,8 @@ public class MusicPlaylist {
         }
     }
 
-    // ---------- เก็บประวัติสำหรับ Undo ----------
     static class Action {
-        boolean wasAdd;   // true = เพิ่ม, false = ลบ
+        boolean wasAdd;
         String name;
         int index;
 
@@ -114,7 +107,7 @@ public class MusicPlaylist {
     static Scanner sc = new Scanner(System.in);
 
     static void pushUndo(Action a) {
-        if (undoStack.size() == MAX_UNDO) undoStack.removeLast(); // เก็บย้อนหลังได้ 5 ครั้ง
+        if (undoStack.size() == MAX_UNDO) undoStack.removeLast();
         undoStack.push(a);
     }
 
@@ -129,7 +122,6 @@ public class MusicPlaylist {
         System.out.println(LINE);
     }
 
-    // 1. Add
     static void addSong() {
         System.out.print("Enter music name : ");
         String name = sc.nextLine().trim();
@@ -142,7 +134,6 @@ public class MusicPlaylist {
         System.out.println("\"" + name + "\" Add success");
     }
 
-    // 2. Search
     static void searchSong() {
         while (true) {
             System.out.print("Search You Music : ");
@@ -155,7 +146,6 @@ public class MusicPlaylist {
             System.out.println("not found");
             System.out.println("    please enter again");
             System.out.print("(press Enter to go back, or type again) ");
-            // ให้ผู้ใช้กรอกใหม่ หรือกด Enter เพื่อกลับเมนู
             String again = sc.nextLine().trim();
             if (again.isEmpty()) return;
             Node f2 = playlist.search(again);
@@ -166,7 +156,6 @@ public class MusicPlaylist {
         }
     }
 
-    // 3. Deleted
     static void deleteSong() {
         if (playlist.isEmpty()) {
             System.out.println("Playlist is empty.");
@@ -186,7 +175,6 @@ public class MusicPlaylist {
         System.out.println("\"" + realName + "\" Deleted success");
     }
 
-    // 4. Playlist  (แสดงรายการ + Next / Previous)
     static void showPlaylist() {
         if (playlist.isEmpty()) {
             System.out.println("Playlist is empty.");
@@ -215,7 +203,6 @@ public class MusicPlaylist {
         }
     }
 
-    // 5. Undo (พิมพ์ 5 ได้สูงสุด 5 ครั้ง)
     static void undo() {
         if (undoStack.isEmpty()) {
             System.out.println("Nothing to undo.");
@@ -258,4 +245,4 @@ public class MusicPlaylist {
             }
         }
     }
-}
+}     
