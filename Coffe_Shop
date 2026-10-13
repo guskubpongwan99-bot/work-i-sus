@@ -1,0 +1,66 @@
+package com.mycompany.cafe2;
+
+import java.util.Scanner;
+
+public class Cafe2 {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        String[] student = {"Your Name", "6830250056"};
+        
+        String[] menuNames = {"Americano", "Cappuccino", "Mocha", "Cocoa", "Green Tea", "Latte"};
+        double[] menuPrices = {45, 50, 60, 55, 65, 70};
+
+        int choice = 0;
+        while (choice < 1 || choice > 6) {
+            System.out.println("----- Menu -----");
+            for (int i = 0; i < menuNames.length; i++) {
+                System.out.println((i + 1) + ". " + menuNames[i] + "\t" + menuPrices[i] + " THB");
+            }
+
+            System.out.print("Choose your menu (1-6): ");
+            if (sc.hasNextInt()) {
+                choice = sc.nextInt();
+            } else {
+                sc.next(); 
+                choice = 0;
+            }
+
+            if (choice < 1 || choice > 6) {
+                System.out.println("Invalid choice! Please choose 1-6 only.\n");
+            }
+        }
+
+        int cups = 0;
+        while (cups <= 0) {
+            System.out.print("Enter quantity: ");
+            if (sc.hasNextInt()) {
+                cups = sc.nextInt();
+            } else {
+                sc.next();
+                cups = 0;
+            }
+
+            if (cups <= 0) {
+                System.out.println("Invalid quantity! Please enter a number greater than 0.");
+            }
+        }
+
+        String id = student[1];
+        int lastTwo = Integer.parseInt(id.substring(8));   // ตัดตั้งแต่ index 8 ถึงท้าย = "56"
+        int lastDigit = Integer.parseInt(id.substring(9)); // ตัดตั้งแต่ index 9 ถึงท้าย = "6"
+
+
+        String menuName = menuNames[choice - 1];
+        double price = menuPrices[choice - 1] + (lastTwo * 2);  
+        int quantity = cups + (lastDigit % 5);                
+
+        System.out.println("Student Name : " + student[0]);
+        System.out.println("Student ID   : " + student[1]);
+
+        CoffeeOrder order = new CoffeeOrder(menuName, price, quantity);
+        order.displayReceipt();
+
+        sc.close();
+    }
+}
