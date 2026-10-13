@@ -1,0 +1,42 @@
+package  com.mycompany.cafe2;
+
+public class CoffeeOrder {
+    
+    private String menuName;
+    private double price;
+    private int quantity;
+
+    public CoffeeOrder(String menuName, double price, int quantity) {
+        this.menuName = menuName;
+        this.price = price;
+        this.quantity = quantity;
+    }
+
+    public double calculateTotal() {
+        return this.price * this.quantity;
+    }
+
+    public double calculateDiscount() {
+        double total = calculateTotal();
+        if (total >= 500) {
+            return total * 0.10;
+        }
+        return 0.0;
+    }
+
+    public void displayReceipt() {
+        double total = calculateTotal();
+        double discount = calculateDiscount();
+        double netTotal = total - discount;
+
+        System.out.println("=================================");
+        System.out.println("--------- Order Summary ---------");
+        System.out.println("Menu Name : " + this.menuName);
+        System.out.println("Price     : " + this.price + " THB");
+        System.out.println("Quantity  : " + this.quantity);
+        System.out.println("Total     : " + total + " THB");
+        System.out.println("Discount  : -" + discount + " THB");
+        System.out.println("Net Total : " + netTotal + " THB");
+        System.out.println("=================================");
+    }
+}
